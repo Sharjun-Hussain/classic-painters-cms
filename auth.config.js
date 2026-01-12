@@ -16,4 +16,5 @@ export const authConfig = {
         },
     },
     providers: [], // Configured in auth.js
+    trustHost: true, // Important: Allows NextAuth to work on Vercel with dynamic URLs
 };

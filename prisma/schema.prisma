@@ -2,9 +2,8 @@
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
 datasource db {
-  provider  = "postgresql"
-  url       = env("PRISMA_DATABASE_URL")
-  directUrl = env("POSTGRES_URL")
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
 }
 
 generator client {
@@ -49,7 +48,7 @@ model SectionContent {
   id        Int      @id @default(autoincrement())
   key       String   @unique
   title     String?
-  content   String   @db.Text
+  content   String
   updatedAt DateTime @updatedAt
 }
 
@@ -72,8 +71,8 @@ model Testimonial {
 
 model SiteSettings {
   id           Int      @id @default(autoincrement())
-  navbarLinks  String   @db.Text
+  navbarLinks  String
   footerText   String?
-  socialLinks  String?  @db.Text
+  socialLinks  String?
   updatedAt    DateTime @updatedAt
 }

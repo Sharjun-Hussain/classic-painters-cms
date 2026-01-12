@@ -1,7 +1,9 @@
 import Sidebar from './components/Sidebar';
 import Header from './components/Header';
+import { SidebarProvider } from './components/SidebarContext';
 import { auth } from '../../auth';
 import { redirect } from 'next/navigation';
+import AdminLayoutClient from './components/AdminLayoutClient';
 
 export default async function AdminLayout({ children }) {
   const session = await auth();
@@ -11,14 +13,10 @@ export default async function AdminLayout({ children }) {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <Sidebar />
-      <div className="ml-64 transition-all duration-300">
-        <Header />
-        <main className="p-8">
-          {children}
-        </main>
+    <SidebarProvider>
+      <div className="min-h-screen bg-gray-50">
+        <AdminLayoutClient>{children}</AdminLayoutClient>
       </div>
-    </div>
+    </SidebarProvider>
   );
 }

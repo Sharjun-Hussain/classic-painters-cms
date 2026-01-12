@@ -1,11 +1,16 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import PageHeader from '../components/PageHeader';
-import { Save, Loader2, Image as ImageIcon } from 'lucide-react';
+import { 
+  Save, Loader2, Image as ImageIcon, 
+  Type, MousePointerClick, 
+  CheckCircle2, AlertCircle, Smartphone, Monitor, RefreshCw 
+} from 'lucide-react';
 
-export default function HeroPage() {
+export default function HeroEditor() {
+  // 1. STATE MANAGEMENT
   const [hero, setHero] = useState({
     title: '',
     subtitle: '',
@@ -16,19 +21,41 @@ export default function HeroPage() {
     secondaryBtnText: '',
     secondaryBtnLink: ''
   });
+  
   const [saving, setSaving] = useState(false);
+  const [status, setStatus] = useState({ type: '', message: '' });
   const [galleryImages, setGalleryImages] = useState([]);
   const [showImagePicker, setShowImagePicker] = useState(false);
+  const [previewDevice, setPreviewDevice] = useState('desktop'); // 'desktop' or 'mobile'
+  const iframeRef = useRef(null);
 
+  // 2. FETCH DATA
   useEffect(() => {
     fetchHero();
     fetchGalleryImages();
   }, []);
 
+  // 3. REAL-TIME BRIDGE (The Magic)
+  // Whenever 'hero' state changes, send it to the iframe
+  useEffect(() => {
+    const sendToPreview = () => {
+      if (iframeRef.current && iframeRef.current.contentWindow) {
+        iframeRef.current.contentWindow.postMessage({
+          type: 'HERO_PREVIEW_UPDATE',
+          data: hero
+        }, '*'); // In production, replace '*' with your specific domain for security
+      }
+    };
+
+    // Small delay to ensure iframe render cycle catches it
+    const timeout = setTimeout(sendToPreview, 100);
+    return () => clearTimeout(timeout);
+  }, [hero]);
+
   const fetchHero = async () => {
     try {
       const res = await axios.get('/api/hero');
-      setHero(res.data);
+      if(res.data) setHero(res.data);
     } catch (error) {
       console.error(error);
     }
@@ -37,7 +64,7 @@ export default function HeroPage() {
   const fetchGalleryImages = async () => {
     try {
       const res = await axios.get('/api/gallery');
-      setGalleryImages(res.data);
+      setGalleryImages(res.data || []);
     } catch (error) {
       console.error(error);
     }
@@ -45,209 +72,197 @@ export default function HeroPage() {
 
   const saveHero = async () => {
     setSaving(true);
+    setStatus({ type: '', message: '' });
     try {
       await axios.post('/api/hero', hero);
-      alert('Hero section saved successfully!');
+      setStatus({ type: 'success', message: 'Hero section published live!' });
+      // Refresh iframe to confirm saved state
+      if(iframeRef.current) iframeRef.current.src = iframeRef.current.src;
     } catch (error) {
-      alert('Failed to save hero section');
+      setStatus({ type: 'error', message: 'Failed to save changes.' });
     } finally {
       setSaving(false);
     }
   };
 
-  const selectImage = (imageUrl) => {
-    setHero({ ...hero, bgImageUrl: imageUrl });
-    setShowImagePicker(false);
-  };
+  const inputClass = "w-full bg-white text-slate-900 border border-slate-200 rounded-lg px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 placeholder:text-slate-400 transition-all text-sm font-medium";
+  const labelClass = "block text-xs font-semibold text-slate-600 uppercase tracking-wider mb-1.5";
 
   return (
-    <div className="max-w-4xl">
-      <PageHeader 
-        title="Hero Section" 
-        description="Edit your homepage hero banner content and call-to-action buttons"
-      />
-
-      <div className="bg-white rounded-xl shadow-sm p-8 space-y-6">
-        {/* Title */}
+    <div className="h-screen flex flex-col bg-slate-50 overflow-hidden">
+      {/* HEADER */}
+      <div className="bg-white border-b border-slate-200 px-6 py-4 flex justify-between items-center shrink-0 z-20 shadow-sm">
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Main Title *
-          </label>
-          <input
-            type="text"
-            value={hero.title || ''}
-            onChange={(e) => setHero({ ...hero, title: e.target.value })}
-            className="w-full border border-gray-300 rounded-lg px-4 py-2 text-gray-800 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            placeholder="Transform Your Space with Expert Painting"
-          />
+           <h1 className="text-xl font-bold text-slate-800">Visual Editor</h1>
+           <p className="text-xs text-slate-500">Editing Homepage Hero Section</p>
         </div>
-
-        {/* Subtitle */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Subtitle (Supports HTML)
-          </label>
-          <textarea
-            value={hero.subtitle || ''}
-            onChange={(e) => setHero({ ...hero, subtitle: e.target.value })}
-            className="w-full border border-gray-300 rounded-lg px-4 py-2 text-gray-800 h-20 focus:ring-2 focus:ring-blue-500 focus:border-transparent font-mono text-sm"
-            placeholder="Professional painting services for <strong>homes</strong> and <strong>businesses</strong>"
-          />
-          <p className="text-xs text-gray-500 mt-1">
-            Use <code className="bg-gray-100 px-1 rounded">&lt;strong&gt;</code> for bold text, 
-            <code className="bg-gray-100 px-1 rounded ml-1">&lt;br/&gt;</code> for line breaks
-          </p>
-        </div>
-
-        {/* Description */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Description
-          </label>
-          <textarea
-            value={hero.description || ''}
-            onChange={(e) => setHero({ ...hero, description: e.target.value })}
-            className="w-full border border-gray-300 rounded-lg px-4 py-2 text-gray-800 h-24 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            placeholder="Additional description text..."
-          />
-        </div>
-
-        <div className="h-px bg-gray-200" />
-
-        {/* Background Image */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Background Image
-          </label>
-          
-          {hero.bgImageUrl && (
-            <div className="mb-3 relative group">
-              <img 
-                src={hero.bgImageUrl} 
-                alt="Hero background preview" 
-                className="w-full h-48 object-cover rounded-lg"
-              />
-              <button
-                onClick={() => setHero({ ...hero, bgImageUrl: '' })}
-                className="absolute top-2 right-2 bg-red-500 text-white px-3 py-1 rounded-md text-sm opacity-0 group-hover:opacity-100 transition-opacity"
-              >
-                Remove
-              </button>
-            </div>
-          )}
-
-          <div className="flex gap-3">
+        
+        <div className="flex items-center gap-4">
+            {status.message && (
+                <div className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium animate-fade-in ${
+                    status.type === 'success' ? 'bg-green-50 text-green-700 border border-green-200' : 'bg-red-50 text-red-700 border border-red-200'
+                }`}>
+                    {status.type === 'success' ? <CheckCircle2 size={16} /> : <AlertCircle size={16} />}
+                    {status.message}
+                </div>
+            )}
             <button
-              onClick={() => setShowImagePicker(!showImagePicker)}
-              className="flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+                onClick={saveHero}
+                disabled={saving}
+                className="flex items-center gap-2 bg-slate-900 text-white px-6 py-2.5 rounded-lg hover:bg-slate-800 transition-all shadow-sm disabled:opacity-50 font-medium text-sm"
             >
-              <ImageIcon size={18} />
-              Select from Gallery
+                {saving ? <Loader2 className="animate-spin" size={18} /> : <Save size={18} />}
+                {saving ? 'Publishing...' : 'Publish Changes'}
             </button>
-            <input
-              type="text"
-              value={hero.bgImageUrl || ''}
-              onChange={(e) => setHero({ ...hero, bgImageUrl: e.target.value })}
-              className="flex-1 border border-gray-300 rounded-lg px-4 py-2 text-gray-800 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              placeholder="Or paste image URL"
-            />
-          </div>
+        </div>
+      </div>
 
-          {/* Image Picker */}
-          {showImagePicker && (
-            <div className="mt-4 p-4 border border-gray-200 rounded-lg bg-gray-50 max-h-96 overflow-y-auto">
-              <div className="grid grid-cols-3 gap-3">
-                {galleryImages.map((img) => (
-                  <div
-                    key={img.id}
-                    onClick={() => selectImage(img.src)}
-                    className="cursor-pointer group relative aspect-video overflow-hidden rounded-lg border-2 border-transparent hover:border-blue-500 transition-all"
-                  >
-                    <img 
-                      src={img.src} 
-                      alt={img.category}
-                      className="w-full h-full object-cover group-hover:scale-110 transition-transform"
+      <div className="flex-1 flex overflow-hidden">
+        
+        {/* LEFT: EDITOR SCROLLABLE */}
+        <div className="w-[450px] border-r border-slate-200 overflow-y-auto bg-white p-6 space-y-8 shrink-0 z-10 shadow-[4px_0_24px_rgba(0,0,0,0.02)]">
+            
+            {/* Text Content */}
+            <div className="space-y-5">
+                <div className="flex items-center gap-2 pb-2 border-b border-slate-100">
+                    <Type className="text-blue-600" size={18} />
+                    <h3 className="font-semibold text-slate-800">Typography</h3>
+                </div>
+                <div>
+                    <label className={labelClass}>Headline</label>
+                    <input
+                        type="text"
+                        value={hero.title || ''}
+                        onChange={(e) => setHero({ ...hero, title: e.target.value })}
+                        className={inputClass}
                     />
-                    <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors" />
-                  </div>
-                ))}
-              </div>
-              {galleryImages.length === 0 && (
-                <p className="text-center text-gray-500 py-8">No images in gallery. Upload some first!</p>
-              )}
+                </div>
+                <div>
+                    <label className={labelClass}>Subtitle</label>
+                    <textarea
+                        value={hero.subtitle || ''}
+                        onChange={(e) => setHero({ ...hero, subtitle: e.target.value })}
+                        className={`${inputClass} h-24 font-mono text-xs leading-relaxed`}
+                    />
+                </div>
+                <div>
+                    <label className={labelClass}>Description</label>
+                    <textarea
+                        value={hero.description || ''}
+                        onChange={(e) => setHero({ ...hero, description: e.target.value })}
+                        className={`${inputClass} h-20`}
+                    />
+                </div>
             </div>
-          )}
+
+            {/* Visuals */}
+            <div className="space-y-5">
+                <div className="flex items-center gap-2 pb-2 border-b border-slate-100">
+                    <ImageIcon className="text-purple-600" size={18} />
+                    <h3 className="font-semibold text-slate-800">Media</h3>
+                </div>
+                <div>
+                    <label className={labelClass}>Background Image</label>
+                    <div className="flex gap-2">
+                        <input
+                            type="text"
+                            value={hero.bgImageUrl || ''}
+                            onChange={(e) => setHero({ ...hero, bgImageUrl: e.target.value })}
+                            className={`${inputClass}`}
+                        />
+                        <button
+                            onClick={() => setShowImagePicker(!showImagePicker)}
+                            className="bg-purple-50 text-purple-700 px-3 rounded-lg border border-purple-200 hover:bg-purple-100"
+                        >
+                            <ImageIcon size={18} />
+                        </button>
+                    </div>
+                </div>
+                
+                {showImagePicker && (
+                    <div className="grid grid-cols-3 gap-2 p-2 bg-slate-50 rounded-lg border border-slate-200">
+                         {galleryImages.map((img, idx) => (
+                            <div key={idx} onClick={() => { setHero({ ...hero, bgImageUrl: img.src }); setShowImagePicker(false); }} className="cursor-pointer aspect-square rounded-md overflow-hidden hover:opacity-80">
+                                <img src={img.src} className="w-full h-full object-cover" />
+                            </div>
+                        ))}
+                    </div>
+                )}
+            </div>
+
+            {/* Buttons */}
+            <div className="space-y-5">
+                <div className="flex items-center gap-2 pb-2 border-b border-slate-100">
+                    <MousePointerClick className="text-green-600" size={18} />
+                    <h3 className="font-semibold text-slate-800">Buttons</h3>
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                    <div>
+                        <label className={labelClass}>Primary Text</label>
+                        <input type="text" value={hero.primaryBtnText} onChange={(e)=>setHero({...hero, primaryBtnText: e.target.value})} className={inputClass} />
+                    </div>
+                    <div>
+                        <label className={labelClass}>Link</label>
+                        <input type="text" value={hero.primaryBtnLink} onChange={(e)=>setHero({...hero, primaryBtnLink: e.target.value})} className={inputClass} />
+                    </div>
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                    <div>
+                        <label className={labelClass}>Secondary Text</label>
+                        <input type="text" value={hero.secondaryBtnText} onChange={(e)=>setHero({...hero, secondaryBtnText: e.target.value})} className={inputClass} />
+                    </div>
+                    <div>
+                        <label className={labelClass}>Link</label>
+                        <input type="text" value={hero.secondaryBtnLink} onChange={(e)=>setHero({...hero, secondaryBtnLink: e.target.value})} className={inputClass} />
+                    </div>
+                </div>
+            </div>
         </div>
 
-        <div className="h-px bg-gray-200" />
+        {/* RIGHT: LIVE PREVIEW AREA */}
+        <div className="flex-1 bg-slate-100 flex flex-col relative">
+            
+            {/* Toolbar */}
+            <div className="h-12 bg-white border-b border-slate-200 flex justify-center items-center gap-4">
+                <button 
+                    onClick={() => setPreviewDevice('desktop')}
+                    className={`p-1.5 rounded ${previewDevice === 'desktop' ? 'bg-blue-100 text-blue-600' : 'text-slate-400 hover:text-slate-600'}`}
+                >
+                    <Monitor size={20} />
+                </button>
+                <button 
+                    onClick={() => setPreviewDevice('mobile')}
+                    className={`p-1.5 rounded ${previewDevice === 'mobile' ? 'bg-blue-100 text-blue-600' : 'text-slate-400 hover:text-slate-600'}`}
+                >
+                    <Smartphone size={20} />
+                </button>
+                <div className="w-px h-4 bg-slate-300 mx-2"></div>
+                <button 
+                    onClick={() => iframeRef.current.src = iframeRef.current.src}
+                    className="text-slate-400 hover:text-slate-600"
+                    title="Refresh Live Site"
+                >
+                    <RefreshCw size={16} />
+                </button>
+            </div>
 
-        {/* Primary CTA Button */}
-        <div className="grid grid-cols-2 gap-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Primary Button Text
-            </label>
-            <input
-              type="text"
-              value={hero.primaryBtnText || ''}
-              onChange={(e) => setHero({ ...hero, primaryBtnText: e.target.value })}
-              className="w-full border border-gray-300 rounded-lg px-4 py-2 text-gray-800 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              placeholder="Get a Free Quote"
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Primary Button Link
-            </label>
-            <input
-              type="text"
-              value={hero.primaryBtnLink || ''}
-              onChange={(e) => setHero({ ...hero, primaryBtnLink: e.target.value })}
-              className="w-full border border-gray-300 rounded-lg px-4 py-2 text-gray-800 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              placeholder="/contact"
-            />
-          </div>
+            {/* Iframe Container */}
+            <div className="flex-1 flex justify-center items-center p-8 overflow-hidden">
+                <div className={`transition-all duration-300 bg-white shadow-2xl overflow-hidden border border-slate-300 ${
+                    previewDevice === 'mobile' 
+                    ? 'w-[375px] h-[667px] rounded-3xl border-8 border-slate-800' 
+                    : 'w-full h-full rounded-lg'
+                }`}>
+                    <iframe
+                        ref={iframeRef}
+                        src="https://classic-painters.vercel.app" // CHANGE THIS TO YOUR ACTUAL SITE URL
+                        className="w-full h-full bg-white"
+                        title="Live Preview"
+                    />
+                </div>
+            </div>
         </div>
 
-        {/* Secondary CTA Button */}
-        <div className="grid grid-cols-2 gap-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Secondary Button Text
-            </label>
-            <input
-              type="text"
-              value={hero.secondaryBtnText || ''}
-              onChange={(e) => setHero({ ...hero, secondaryBtnText: e.target.value })}
-              className="w-full border border-gray-300 rounded-lg px-4 py-2 text-gray-800 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              placeholder="View Our Work"
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Secondary Button Link
-            </label>
-            <input
-              type="text"
-              value={hero.secondaryBtnLink || ''}
-              onChange={(e) => setHero({ ...hero, secondaryBtnLink: e.target.value })}
-              className="w-full border border-gray-300 rounded-lg px-4 py-2 text-gray-800 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              placeholder="/gallery"
-            />
-          </div>
-        </div>
-
-        {/* Save Button */}
-        <div className="pt-4">
-          <button
-            onClick={saveHero}
-            disabled={saving}
-            className="flex items-center gap-2 bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 font-medium"
-          >
-            {saving ? <Loader2 className="animate-spin" size={20} /> : <Save size={20} />}
-            {saving ? 'Saving...' : 'Save Hero Section'}
-          </button>
-        </div>
       </div>
     </div>
   );

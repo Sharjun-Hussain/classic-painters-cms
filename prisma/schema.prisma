@@ -1,0 +1,85 @@
+generator client {
+  provider = "prisma-client-js"
+  engineType = "binary"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model SiteSettings {
+  id          Int      @id @default(autoincrement())
+  navbarLinks String   // JSON string
+  footerText  String?
+  socialLinks String?  // JSON string
+  updatedAt   DateTime @updatedAt
+}
+
+
+model HeroSection {
+  id              Int      @id @default(autoincrement())
+  title           String
+  subtitle        String?
+  subtitle2       String?  // For gradient/gold text
+  description     String?
+  bgImageUrl      String?
+  primaryBtnText  String?
+  primaryBtnLink  String?
+  secondaryBtnText String?
+  secondaryBtnLink String?
+  updatedAt       DateTime @updatedAt
+}
+
+model SectionContent {
+  id        Int      @id @default(autoincrement())
+  key       String   @unique // e.g., 'services', 'about'
+  title     String?
+  content   String   // JSON string for flexible content
+  updatedAt DateTime @updatedAt
+}
+
+model GalleryImage {
+  id        Int      @id @default(autoincrement())
+  src       String
+  category  String
+  title     String?
+  createdAt DateTime @default(now())
+}
+
+model Service {
+  id          Int      @id @default(autoincrement())
+  title       String
+  description String
+  icon        String?
+  createdAt   DateTime @default(now())
+}
+
+model Testimonial {
+  id        Int      @id @default(autoincrement())
+  name      String
+  role      String?
+  content   String
+  avatar    String?
+  createdAt DateTime @default(now())
+}
+
+
+model ProcessStep {
+  id          Int      @id @default(autoincrement())
+  title       String
+  description String
+  stepNumber  Int
+  createdAt   DateTime @default(now())
+}
+
+model User {
+  id               Int      @id @default(autoincrement())
+  email            String   @unique
+  password         String
+  name             String?
+  resetToken       String?
+  resetTokenExpiry DateTime?
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+}

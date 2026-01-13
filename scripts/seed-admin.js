@@ -1,7 +1,23 @@
 const { PrismaClient } = require('@prisma/client');
+const { PrismaLibSql } = require('@prisma/adapter-libsql');
+const { createClient } = require('@libsql/client');
 const bcrypt = require('bcryptjs');
 
-const prisma = new PrismaClient();
+const databaseUrl = process.env.DATABASE_URL || process.env.TURSO_DATABASE_URL;
+const authToken = process.env.TURSO_AUTH_TOKEN;
+
+let prisma;
+
+if (authToken && databaseUrl?.startsWith('libsql://')) {
+    const libsql = createClient({
+        url: databaseUrl,
+        authToken: authToken,
+    });
+    const adapter = new PrismaLibSql(libsql);
+    prisma = new PrismaClient({ adapter });
+} else {
+    prisma = new PrismaClient();
+}
 
 async function main() {
     const email = 'admin@gmail.com';

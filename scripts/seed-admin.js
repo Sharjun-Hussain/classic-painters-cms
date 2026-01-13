@@ -1,5 +1,5 @@
 const { PrismaClient } = require('@prisma/client');
-const { PrismaLibSql } = require('@prisma/adapter-libsql');
+const { PrismaLibSQL } = require('@prisma/adapter-libsql');
 const { createClient } = require('@libsql/client');
 const bcrypt = require('bcryptjs');
 
@@ -13,7 +13,7 @@ if (authToken && databaseUrl?.startsWith('libsql://')) {
         url: databaseUrl,
         authToken: authToken,
     });
-    const adapter = new PrismaLibSql(libsql);
+    const adapter = new PrismaLibSQL(libsql);
     prisma = new PrismaClient({ adapter });
 } else {
     prisma = new PrismaClient();

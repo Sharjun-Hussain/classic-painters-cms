@@ -52,8 +52,8 @@ export default function AuditLogsPage() {
     <div className="p-6">
       <div className="max-w-6xl mx-auto space-y-6">
         <PageHeader
-          title="Audit Logs"
-          description="Track system activity and changes."
+          title="Activity Logs"
+          description="Monitor all administrative actions and system changes for security."
         />
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">

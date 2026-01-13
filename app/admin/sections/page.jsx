@@ -55,8 +55,8 @@ export default function SectionsPage() {
   return (
     <div>
       <PageHeader 
-        title="Page Sections" 
-        description="Edit content for various page sections"
+        title="Content Sections" 
+        description="Manage the text and layout of various sections across your website."
       />
 
       {/* Section Selector */}

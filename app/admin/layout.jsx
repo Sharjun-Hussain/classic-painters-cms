@@ -5,6 +5,13 @@ import { auth } from '../../auth';
 import { redirect } from 'next/navigation';
 import AdminLayoutClient from './components/AdminLayoutClient';
 
+export const metadata = {
+  title: {
+    template: '%s | Admin Dashboard',
+    default: 'Admin Dashboard',
+  },
+};
+
 export default async function AdminLayout({ children }) {
   const session = await auth();
   

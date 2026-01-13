@@ -267,9 +267,9 @@ export default function GalleryPage() {
         
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-slate-100 pb-6">
           <div>
-            <h1 className="text-4xl font-extrabold tracking-tight text-slate-900">Gallery Management</h1>
+            <h1 className="text-4xl font-extrabold tracking-tight text-slate-900">Portfolio Gallery</h1>
             <p className="text-slate-500 mt-2 text-lg">
-              Manage your portfolio images, project names, and SEO tags.
+              Showcase your best work with high-quality images and project details.
             </p>
           </div>
           

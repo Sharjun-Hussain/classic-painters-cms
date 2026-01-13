@@ -129,8 +129,8 @@ export default function TestimonialsPage() {
     <div className="bg-gray-50/50 pb-24 w-full min-h-screen">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
         <PageHeader
-          title="Testimonials"
-          description="Manage customer reviews and feedback."
+          title="Client Testimonials"
+          description="Manage and display feedback from your satisfied customers."
         />
 
         <div className="mt-6 flex flex-col lg:flex-row gap-6 items-start">

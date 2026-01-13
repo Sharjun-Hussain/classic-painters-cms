@@ -64,8 +64,8 @@ export default function UsersPage() {
         {/* Header Section */}
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
           <div>
-            <h1 className="text-3xl font-bold text-slate-900 tracking-tight">Team Members</h1>
-            <p className="text-slate-500 mt-2 text-lg">Manage access, roles, and administrative permissions.</p>
+            <h1 className="text-3xl font-bold text-slate-900 tracking-tight">User Management</h1>
+            <p className="text-slate-500 mt-2 text-lg">Control who has access to this admin dashboard and their roles.</p>
           </div>
           
           <button

@@ -93,8 +93,8 @@ export default function HeroEditor() {
       {/* HEADER */}
       <div className="bg-white border-b border-slate-200 px-6 py-4 flex justify-between items-center shrink-0 z-20 shadow-sm">
         <div>
-           <h1 className="text-xl font-bold text-slate-800">Visual Editor</h1>
-           <p className="text-xs text-slate-500">Editing Homepage Hero Section</p>
+           <h1 className="text-xl font-bold text-slate-800">Hero Section Editor</h1>
+           <p className="text-xs text-slate-500">Customize the first thing your visitors see: the homepage hero area.</p>
         </div>
         
         <div className="flex items-center gap-4">

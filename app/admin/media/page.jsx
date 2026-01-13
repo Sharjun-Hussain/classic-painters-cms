@@ -144,9 +144,9 @@ export default function MediaPage() {
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-slate-100 pb-6">
           <div>
-            <h1 className="text-4xl font-extrabold tracking-tight text-slate-900">Media Library</h1>
+            <h1 className="text-4xl font-extrabold tracking-tight text-slate-900">Media Assets</h1>
             <p className="text-slate-500 mt-2 text-lg">
-              Manage all system assets, gallery images, and branding files.
+              Centralized library for all your website's images, logos, and files.
             </p>
           </div>
           

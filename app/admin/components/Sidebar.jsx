@@ -27,7 +27,7 @@ const navItems = [
   { href: '/admin/hero', label: 'Hero Section', icon: Layout },
   { href: '/admin/services', label: 'Services', icon: List },
   { href: '/admin/testimonials', label: 'Testimonials', icon: MessageSquare },
-  { href: '/admin/sections', label: 'Page Sections', icon: FileText },
+  // { href: '/admin/sections', label: 'Page Sections', icon: FileText },
   { href: '/admin/settings', label: 'Site Settings', icon: Settings },
   { href: '/admin/users', label: 'Users', icon: Users },
   { href: '/admin/logs', label: 'Audit Logs', icon: History },

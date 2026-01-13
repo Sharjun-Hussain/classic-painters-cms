@@ -1,7 +1,9 @@
 'use client';
 
+import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import PageHeader from './components/PageHeader';
+import axios from 'axios';
 import { 
   Image as ImageIcon, 
   Layout, 
@@ -58,11 +60,34 @@ const quickLinks = [
 ];
 
 export default function AdminDashboard() {
+  const [stats, setStats] = useState({
+    gallery: 0,
+    services: 0,
+    testimonials: 0,
+    users: 0
+  });
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchStats = async () => {
+      try {
+        const response = await axios.get('/api/dashboard');
+        setStats(response.data);
+      } catch (error) {
+        console.error('Error fetching dashboard stats:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchStats();
+  }, []);
+
   return (
     <div>
       <PageHeader 
-        title="Dashboard" 
-        description="Welcome to your content management system"
+        title="Admin Dashboard" 
+        description="Overview of your website's content and performance."
       />
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -99,19 +124,27 @@ export default function AdminDashboard() {
         <h2 className="text-lg font-semibold text-gray-900 mb-4">Quick Stats</h2>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           <div className="text-center">
-            <div className="text-2xl font-bold text-blue-600">-</div>
+            <div className="text-2xl font-bold text-blue-600">
+              {loading ? '-' : stats.gallery}
+            </div>
             <div className="text-sm text-gray-600 mt-1">Gallery Images</div>
           </div>
           <div className="text-center">
-            <div className="text-2xl font-bold text-green-600">-</div>
+            <div className="text-2xl font-bold text-green-600">
+              {loading ? '-' : stats.services}
+            </div>
             <div className="text-sm text-gray-600 mt-1">Services</div>
           </div>
           <div className="text-center">
-            <div className="text-2xl font-bold text-yellow-600">-</div>
+            <div className="text-2xl font-bold text-yellow-600">
+              {loading ? '-' : stats.testimonials}
+            </div>
             <div className="text-sm text-gray-600 mt-1">Testimonials</div>
           </div>
           <div className="text-center">
-            <div className="text-2xl font-bold text-purple-600">1</div>
+            <div className="text-2xl font-bold text-purple-600">
+              {loading ? '-' : stats.users}
+            </div>
             <div className="text-sm text-gray-600 mt-1">Admin Users</div>
           </div>
         </div>

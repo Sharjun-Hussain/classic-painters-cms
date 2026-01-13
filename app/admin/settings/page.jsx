@@ -437,8 +437,8 @@ export default function SettingsPage() {
     <div className="bg-gray-50/50 pb-24 w-full">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
         <PageHeader
-          title="Site Configuration"
-          description="Manage your website's global settings."
+          title="Global Settings"
+          description="Configure site-wide branding, contact information, and navigation."
         />
 
         <div className="mt-6 grid grid-cols-1 lg:grid-cols-2 gap-4 items-start">

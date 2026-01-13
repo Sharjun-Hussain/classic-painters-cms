@@ -19,6 +19,8 @@ export async function GET() {
                     primaryBtnLink: '#contact',
                     secondaryBtnText: 'Call 0800 PAINTER',
                     secondaryBtnLink: 'tel:0800PAINTER',
+                    availabilityText: 'Accepting Jobs for Summer 2026',
+                    locations: 'Auckland • Wellington • Christchurch',
                 },
             });
         }
@@ -54,6 +56,8 @@ export async function POST(request) {
                 primaryBtnLink: data.primaryBtnLink || null,
                 secondaryBtnText: data.secondaryBtnText || null,
                 secondaryBtnLink: data.secondaryBtnLink || null,
+                availabilityText: data.availabilityText || null,
+                locations: data.locations || null,
             },
             create: {
                 title: data.title,
@@ -64,6 +68,8 @@ export async function POST(request) {
                 primaryBtnLink: data.primaryBtnLink || null,
                 secondaryBtnText: data.secondaryBtnText || null,
                 secondaryBtnLink: data.secondaryBtnLink || null,
+                availabilityText: data.availabilityText || null,
+                locations: data.locations || null,
             },
         });
 

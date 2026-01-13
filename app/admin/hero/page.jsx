@@ -129,6 +129,26 @@ export default function HeroEditor() {
                     <h3 className="font-semibold text-slate-800">Typography</h3>
                 </div>
                 <div>
+                    <label className={labelClass}>Availability Text</label>
+                    <input
+                        type="text"
+                        value={hero.availabilityText || ''}
+                        onChange={(e) => setHero({ ...hero, availabilityText: e.target.value })}
+                        className={inputClass}
+                        placeholder="e.g. Accepting Jobs for Summer 2026"
+                    />
+                </div>
+                <div>
+                    <label className={labelClass}>Locations</label>
+                    <input
+                        type="text"
+                        value={hero.locations || ''}
+                        onChange={(e) => setHero({ ...hero, locations: e.target.value })}
+                        className={inputClass}
+                        placeholder="e.g. Auckland • Wellington • Christchurch"
+                    />
+                </div>
+                <div>
                     <label className={labelClass}>Headline</label>
                     <input
                         type="text"

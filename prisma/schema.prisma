@@ -45,6 +45,8 @@ model HeroSection {
   primaryBtnLink  String?
   secondaryBtnText String?
   secondaryBtnLink String?
+  availabilityText String?
+  locations       String?
   updatedAt       DateTime @updatedAt
 }
 

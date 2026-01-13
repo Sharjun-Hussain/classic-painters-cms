@@ -20,6 +20,8 @@ model User {
   resetTokenExpiry  DateTime?
   createdAt         DateTime  @default(now())
   updatedAt         DateTime  @updatedAt
+  auditLogs         AuditLog[]
+  isSuperAdmin      Boolean   @default(false)
 }
 
 model GalleryImage {
@@ -27,6 +29,7 @@ model GalleryImage {
   src       String
   category  String
   title     String?
+  projectName String?
   createdAt DateTime @default(now())
 }
 
@@ -57,6 +60,7 @@ model Service {
   title       String
   description String
   icon        String?
+  bgImage     String?
   createdAt   DateTime @default(now())
 }
 
@@ -74,5 +78,28 @@ model SiteSettings {
   navbarLinks  String
   footerText   String?
   socialLinks  String?
+  contactEmail String?
+  contactPhone String?
+  contactAddress String?
+  quickLinks   String?
+  logo         String?
+  headerLogo   String?
+  headerLogoWidth String?
+  headerLogoHeight String?
+  footerLogo   String?
+  footerLogoWidth String?
+  footerLogoHeight String?
+  favicon      String?
   updatedAt    DateTime @updatedAt
+}
+
+model AuditLog {
+  id        Int      @id @default(autoincrement())
+  action    String   // CREATE, UPDATE, DELETE, LOGIN
+  entity    String   // User, Settings, Hero, etc.
+  entityId  String?  // ID of the affected entity
+  details   String?  // JSON string for details (before/after state)
+  userId    Int?
+  user      User?    @relation(fields: [userId], references: [id])
+  createdAt DateTime @default(now())
 }

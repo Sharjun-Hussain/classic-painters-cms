@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
+import { createAuditLog } from '@/lib/audit';
 
 export async function GET() {
     try {
@@ -40,6 +41,8 @@ export async function POST(request) {
         console.log('Updating hero with data:', data);
 
         // Update or create hero section
+        const previousHero = await prisma.heroSection.findFirst({ where: { id: data.id || 1 } });
+
         const hero = await prisma.heroSection.upsert({
             where: { id: data.id || 1 },
             update: {
@@ -63,6 +66,8 @@ export async function POST(request) {
                 secondaryBtnLink: data.secondaryBtnLink || null,
             },
         });
+
+        await createAuditLog('UPDATE', 'Hero', hero.id, { previous: previousHero, new: hero }, 1);
 
         console.log('Hero updated successfully:', hero.id);
 

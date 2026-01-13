@@ -1,9 +1,23 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import { supabase, supabaseAdmin } from '@/lib/supabase';
+import { createAuditLog } from '@/lib/audit';
 
-export async function GET() {
+export async function GET(request) {
+    const { searchParams } = new URL(request.url);
+    const type = searchParams.get('type');
+
+    let where = {};
+    if (type !== 'all') {
+        where = {
+            category: {
+                notIn: ['Branding', 'System']
+            }
+        };
+    }
+
     const images = await prisma.galleryImage.findMany({
+        where,
         orderBy: { createdAt: 'desc' },
     });
     return NextResponse.json(images, {
@@ -19,7 +33,7 @@ export async function OPTIONS() {
     return NextResponse.json({}, {
         headers: {
             'Access-Control-Allow-Origin': '*',
-            'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+            'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
             'Access-Control-Allow-Headers': 'Content-Type, Authorization',
         },
     });
@@ -83,8 +97,11 @@ export async function POST(request) {
                 src: publicUrl,
                 category: category || 'Uncategorized',
                 title,
+                projectName: formData.get('projectName') || '',
             },
         });
+
+        await createAuditLog('CREATE', 'GalleryImage', image.id, image, 1);
 
         console.log('Database record created:', image.id);
 
@@ -100,6 +117,48 @@ export async function POST(request) {
             error: `Internal Server Error: ${e.message}`,
             stack: process.env.NODE_ENV === 'development' ? e.stack : undefined
         }, {
+            status: 500,
+            headers: { 'Access-Control-Allow-Origin': '*' }
+        });
+    }
+}
+
+
+
+export async function PUT(request) {
+    try {
+        const body = await request.json();
+        const { id, title, projectName, category } = body;
+
+        if (!id) {
+            return NextResponse.json({ error: 'ID required' }, { status: 400 });
+        }
+
+        const previousImage = await prisma.galleryImage.findUnique({
+            where: { id: Number(id) }
+        });
+
+        if (!previousImage) {
+            return NextResponse.json({ error: 'Image not found' }, { status: 404 });
+        }
+
+        const image = await prisma.galleryImage.update({
+            where: { id: Number(id) },
+            data: {
+                title: title || undefined,
+                projectName: projectName || undefined,
+                category: category || undefined
+            }
+        });
+
+        await createAuditLog('UPDATE', 'GalleryImage', id, { previous: previousImage, new: image }, 1);
+
+        return NextResponse.json(image, {
+            headers: { 'Access-Control-Allow-Origin': '*' }
+        });
+    } catch (e) {
+        console.error('Update error:', e);
+        return NextResponse.json({ error: e.message }, {
             status: 500,
             headers: { 'Access-Control-Allow-Origin': '*' }
         });
@@ -148,6 +207,8 @@ export async function DELETE(request) {
         await prisma.galleryImage.delete({
             where: { id: Number.parseInt(id) },
         });
+
+        await createAuditLog('DELETE', 'GalleryImage', id, image, 1);
 
         console.log('Image deleted successfully');
 

@@ -371,6 +371,8 @@ export default function SettingsPage() {
     footerLogo: "",
     footerLogoWidth: "",
     footerLogoHeight: "",
+    navbarCtaText: "",
+    navbarCtaLink: "",
   });
   const [saving, setSaving] = useState(false);
 
@@ -410,6 +412,8 @@ export default function SettingsPage() {
         footerLogo: data.footerLogo || "",
         footerLogoWidth: data.footerLogoWidth || "",
         footerLogoHeight: data.footerLogoHeight || "",
+        navbarCtaText: data.navbarCtaText || "",
+        navbarCtaLink: data.navbarCtaLink || "",
       });
     } catch (error) {
       console.error(error);
@@ -545,6 +549,24 @@ export default function SettingsPage() {
                   setSettings({ ...settings, navbarLinks: newLinks })
                 }
               />
+
+              <div className="border-t border-gray-100 pt-4 mt-4 space-y-4">
+                <h4 className="text-[11px] font-bold text-gray-500 uppercase tracking-wider">CTA Button</h4>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <InputField
+                    label="Button Text"
+                    value={settings.navbarCtaText}
+                    onChange={(e) => setSettings({ ...settings, navbarCtaText: e.target.value })}
+                    placeholder="e.g. Get a Quote"
+                  />
+                  <InputField
+                    label="Button Link"
+                    value={settings.navbarCtaLink}
+                    onChange={(e) => setSettings({ ...settings, navbarCtaLink: e.target.value })}
+                    placeholder="e.g. #contact"
+                  />
+                </div>
+              </div>
 
               <div className="border-t border-gray-100 pt-4 mt-4">
                 <LinkListEditor

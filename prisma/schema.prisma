@@ -91,6 +91,8 @@ model SiteSettings {
   footerLogoWidth String?
   footerLogoHeight String?
   favicon      String?
+  navbarCtaText String?
+  navbarCtaLink String?
   updatedAt    DateTime @updatedAt
 }
 

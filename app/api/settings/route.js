@@ -20,7 +20,8 @@ export async function POST(request) {
             navbarLinks, footerText, socialLinks, contactEmail, contactPhone, contactAddress, quickLinks,
             logo, favicon,
             headerLogo, headerLogoWidth, headerLogoHeight,
-            footerLogo, footerLogoWidth, footerLogoHeight
+            footerLogo, footerLogoWidth, footerLogoHeight,
+            navbarCtaText, navbarCtaLink
         } = body;
 
         // Upsert: Update if exists, create if not (using id: 1 as singleton)
@@ -39,7 +40,8 @@ export async function POST(request) {
                 logo,
                 favicon,
                 headerLogo, headerLogoWidth, headerLogoHeight,
-                footerLogo, footerLogoWidth, footerLogoHeight
+                footerLogo, footerLogoWidth, footerLogoHeight,
+                navbarCtaText, navbarCtaLink
             },
             create: {
                 id: 1,
@@ -53,7 +55,8 @@ export async function POST(request) {
                 logo,
                 favicon,
                 headerLogo, headerLogoWidth, headerLogoHeight,
-                footerLogo, footerLogoWidth, footerLogoHeight
+                footerLogo, footerLogoWidth, footerLogoHeight,
+                navbarCtaText, navbarCtaLink
             },
         });
 
